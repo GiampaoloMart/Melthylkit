@@ -1,24 +1,18 @@
-# Base image con R
-FROM r-base:latest
+FROM muhengliao/methylkit:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Aggiorna e installa librerie di sistema richieste da molti pacchetti bioinformatici
+# Install dependencies for RStudio Server
 RUN apt-get update && apt-get install -y \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libxml2-dev \
-    git \
-    wget \
+    gdebi-core wget sudo libssl-dev libapparmor1 libedit2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Installa BiocManager e remotes (più leggero di devtools)
-RUN R -e "install.packages(c('BiocManager','remotes'), repos='https://cloud.r-project.org')"
+# Download and install RStudio Server
+RUN wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2025.09.0-421-amd64.deb -O /tmp/rstudio-server.deb \
+    && gdebi -n /tmp/rstudio-server.deb \
+    && rm /tmp/rstudio-server.deb
 
-# Installa methylKit dalla branch development di GitHub
-RUN R -e "remotes::install_github('al2na/methylKit', build_vignettes=FALSE, repos=BiocManager::repositories(), ref='development', dependencies=TRUE)"
+# Add RStudio Server to PATH
+ENV PATH="/usr/lib/rstudio-server/bin:${PATH}"
 
-WORKDIR /home/ruser
+CMD ["/bin/bash"]
 
-CMD ["R"]
 
