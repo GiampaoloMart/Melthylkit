@@ -17,16 +17,13 @@ RUN apt-get update && apt-get install -y \
 # Installa BiocManager
 RUN R -e "if (!require('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')"
 
-# Imposta Bioconductor su versione devel
-RUN R -e "BiocManager::install(version='devel', ask=FALSE)"
+# Imposta Bioconductor compatibile con R 4.5
+RUN R -e "BiocManager::install(version='3.22', ask=FALSE)"
 
-# Installa methylKit
+# Installa methylKit da Bioconductor
 RUN R -e "BiocManager::install('methylKit', ask=FALSE)"
 
-# Directory di lavoro
 WORKDIR /data
-
-# Comando di default
 CMD ["R"]
 
 
