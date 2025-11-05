@@ -2,7 +2,7 @@ FROM rocker/r-base:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Installa dipendenze di sistema per Bioconductor e pacchetti R complessi
+# Installa dipendenze di sistema
 RUN apt-get update && apt-get install -y \
     libssl-dev \
     libcurl4-openssl-dev \
@@ -14,14 +14,19 @@ RUN apt-get update && apt-get install -y \
     r-base-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Installa BiocManager e methylKit (versione devel)
-RUN R -e "if (!require('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" \
-    && R -e "BiocManager::install(version='devel', ask=FALSE)" \
-    && R -e \"BiocManager::install('methylKit', ask=FALSE)\"
+# Installa BiocManager
+RUN R -e "if (!require('BiocManager', quietly = TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')"
 
-# Imposta la working directory
+# Imposta Bioconductor su versione devel
+RUN R -e "BiocManager::install(version='devel', ask=FALSE)"
+
+# Installa methylKit
+RUN R -e "BiocManager::install('methylKit', ask=FALSE)"
+
+# Directory di lavoro
 WORKDIR /data
 
-# Comando di default: apre R
+# Comando di default
 CMD ["R"]
+
 
